@@ -1,6 +1,7 @@
 import os
 from xml.etree import ElementTree as ET
 import csv
+import numpy as np
 
 
 def get_dict(ann_dir):
@@ -27,10 +28,13 @@ def get_dict(ann_dir):
 		                             classes.append(child2.text)
 		                     elif child2.tag == 'bndbox':
 		                             for child3 in child2:
-		                                     a.append(child3.text)
+		                                     a.append(int(child3.text))
 		             bbox.append(a)
 		     if child1.tag == 'filename':
 		     	img_name = child1.text
+
+		classes = np.asarray(classes)
+		bbox = np.asarray(bbox)
 
 		dict_main['classes'].append(classes)
 		dict_main['roi'].append(bbox)
@@ -39,6 +43,8 @@ def get_dict(ann_dir):
 	csv_file = './../data.csv'
 
 	with open(csv_file, 'w') as f:
+
+		f.write('ImageLOC,ROI,Classes\n')
 
 		for i in range(len(dict_main['file_path'])):
 			a = '"{}"'.format(str(dict_main['file_path'][i]))
