@@ -4,15 +4,24 @@ import csv
 import numpy as np
 from preprocess import *
 
+dict_main = {
+	'file_path' : [],
+	'classes' : [],
+	'roi' : []
+}
 
-def get_dict(ann_dir):
 
-	dict_main = {
-		'file_path' : [],
-		'classes' : [],
-		'roi' : []
-	}
-	img_source_path = './../Dataset/Train/VOCdevkit/VOC2007/JPEGImages/'
+def get_dict(ann_dir, time):
+
+
+	img_source_path_train = './../Dataset/Train/VOCdevkit/VOC2007/JPEGImages/'
+	img_source_path_test = './../Dataset/Test/VOCdevkit/VOC2007/JPEGImages/'
+
+	if time == 'Train':
+		img_source_path = img_source_path_train
+	elif time == 'Test':
+		img_source_path = img_source_path_test
+
 
 	for file in os.listdir(ann_dir):
 		file = ann_dir + file
@@ -40,7 +49,6 @@ def get_dict(ann_dir):
 		dict_main['classes'].append(classes)
 		dict_main['roi'].append(bbox)
 		dict_main['file_path'].append(img_source_path + img_name)
-	return dict_main
 
 
 def create_csv(dict_main):
@@ -62,8 +70,10 @@ def create_csv(dict_main):
 
 
 
-ann_dir = './../Dataset/Train/VOCdevkit/VOC2007/Annotations/'
-dict_main = get_dict(ann_dir)
+ann_dir_train = './../Dataset/Train/VOCdevkit/VOC2007/Annotations/'
+ann_dir_test = './../Dataset/Test/VOCdevkit/VOC2007/Annotations/'
+get_dict(ann_dir_train, time='Train')
+get_dict(ann_dir_test, time='Test')
+print(len(dict_main['classes']))
 dict_main = pre_process(dict_main)
 create_csv(dict_main)
-print(dict_main.keys())

@@ -1,9 +1,11 @@
 import cv2
 from PIL import Image
 import numpy as np
+import os
 
 def pre_process(dict_main):
 	print('Preprocessing..')
+	os.system('mkdir ./../ResizedJPEGImages')
 	for i in range(len(dict_main['classes'])):
 		loc = dict_main['file_path'][i]
 		r = dict_main['roi'][i]
@@ -20,7 +22,7 @@ def pre_process(dict_main):
 def resize_img(image_loc, roi, i):
     im = np.array(Image.open(image_loc), dtype=np.uint8)
     img = cv2.resize(im, (200, 200))
-    new_image_loc = './../Dataset/Train/VOCdevkit/VOC2007/ResizedJPEGImages/' + str(i) + '.jpg'
+    new_image_loc = './../ResizedJPEGImages/' + str(i) + '.jpg'
     cv2.imwrite(new_image_loc, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
     new_roi = []
     for i in range(roi.shape[0]):
