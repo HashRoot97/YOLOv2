@@ -2,6 +2,7 @@ import os
 from xml.etree import ElementTree as ET
 import csv
 import numpy as np
+from preprocess import *
 
 
 def get_dict(ann_dir):
@@ -29,7 +30,7 @@ def get_dict(ann_dir):
 		                     elif child2.tag == 'bndbox':
 		                             for child3 in child2:
 		                                     a.append(int(child3.text))
-		             bbox.append(a)
+		             bbox.append(np.asarray(a))
 		     if child1.tag == 'filename':
 		     	img_name = child1.text
 
@@ -39,6 +40,11 @@ def get_dict(ann_dir):
 		dict_main['classes'].append(classes)
 		dict_main['roi'].append(bbox)
 		dict_main['file_path'].append(img_source_path + img_name)
+	return dict_main
+
+
+def create_csv(dict_main):
+	print('Creating CSV')
 	os.system('touch ./../data.csv')
 	csv_file = './../data.csv'
 
@@ -48,15 +54,16 @@ def get_dict(ann_dir):
 
 		for i in range(len(dict_main['file_path'])):
 			a = '"{}"'.format(str(dict_main['file_path'][i]))
-			b = '"{}"'.format(str(dict_main['roi'][i]))
+			b = str(dict_main['roi'][i]).replace('\n', ' ')
 			c = '"{}"'.format(str(dict_main['classes'][i]))
 
-			line = a + ',' + b + ',' + c + '\n'
+			line = a + ',' + b + ',' + c.replace("'", '') + '\n'
 			f.write(line)
 
-	return dict_main
 
 
 ann_dir = './../Dataset/Train/VOCdevkit/VOC2007/Annotations/'
 dict_main = get_dict(ann_dir)
+dict_main = pre_process(dict_main)
+create_csv(dict_main)
 print(dict_main.keys())
