@@ -162,17 +162,12 @@ def process_tfrecord_batch(name, thread_index, ranges, file_names, classes, rois
 			clas = classes[i]
 			roi = rois[i]
 
-			image_data, raw_w, raw_h = _process_image(filename)
+			image_data = _process_image(filename)
 			
 			#print_image(roi, clas, image_data, filename, anchors)
 			
-			label = create_labels(roi, clas, num_anchors, raw_w, raw_h, anchors)
+			label = create_labels(roi, clas, num_anchors, anchors)
 			
-			"""for x in range(13):
-				for y in range( 13):
-					print(label[x, y, :])
-			exit()
-			"""
 			example = convert_to_example(image_data, label)
 			
 			writer.write(example.SerializeToString())
@@ -192,13 +187,12 @@ def _process_image(filename):
 	"""Read image files from disk"""
 	img_data = cv2.imread(filename)
 	img_data = cv2.cvtColor(img_data, cv2.COLOR_BGR2RGB)
-	raw_w, raw_h, _ = np.shape(img_data)
 
-	return img_data, raw_w, raw_h
-
+	return img_data
 
 
-def create_labels(rois, classes, num_anchors, raw_w, raw_h, anchors):
+
+def create_labels(rois, classes, num_anchors, anchors):
 
 	labels = np.zeros([FLAGS.num_grids, FLAGS.num_grids, (num_anchors*(5 + FLAGS.num_classes))])
 	
@@ -310,7 +304,7 @@ def get_grid_cell(roi, grid_w, grid_h):
 
 def anchor_to_label(roi, anchors, active_anchors, grid_x, grid_y, clas):
 
-	label = np.zeros([13, 13, 125])
+	label = np.zeros([FLAGS.num_grids, FLAGS.num_grids, (5*(5 + FLAGS.num_classes))])
 
 	if active_anchors[0] != 0:
 		j = 25*active_anchors[0]-1
