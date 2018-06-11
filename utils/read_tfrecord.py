@@ -55,25 +55,25 @@ def read_tf_records(batch_size=32):
 
 		min_queue_examples = 500
 
-		#for i in range(len(tf_records)):
-		filename_queue = tf.train.string_input_producer([tf_records[0]], num_epochs=None)
+		for i in range(len(tf_records)):
+			filename_queue = tf.train.string_input_producer([tf_records[i]], num_epochs=None)
 
-		reader = tf.TFRecordReader()
-		_, serialized_example = reader.read(filename_queue)
+			reader = tf.TFRecordReader()
+			_, serialized_example = reader.read(filename_queue)
 
 
-		batch = tf.train.shuffle_batch([serialized_example], batch_size=batch_size, capacity=min_queue_examples+100*batch_size, num_threads=1, 
-			min_after_dequeue=min_queue_examples)
-		parsed_example = tf.parse_example(batch, features=features)
+			batch = tf.train.shuffle_batch([serialized_example], batch_size=batch_size, capacity=min_queue_examples+100*batch_size, num_threads=1, 
+				min_after_dequeue=min_queue_examples)
+			parsed_example = tf.parse_example(batch, features=features)
 
-		image_raw = tf.decode_raw(parsed_example['image_data'], tf.uint8)
-		image = tf.cast(tf.reshape(image_raw, [batch_size, 416, 416, 3]), tf.float64)
-		image = image/255.0
+			image_raw = tf.decode_raw(parsed_example['image_data'], tf.uint8)
+			image = tf.cast(tf.reshape(image_raw, [batch_size, 416, 416, 3]), tf.float64)
+			image = image/255.0
 
-		labels_raw = tf.decode_raw(parsed_example['labels'], tf.float64)
-		label = tf.reshape(labels_raw, [batch_size, 13, 13, 125])
-		
-			#images, labels = tf.train.shuffle_batch([image, label], batch_size=10, capacity=30, num_threads=1, min_after_dequeue=10)
+			labels_raw = tf.decode_raw(parsed_example['labels'], tf.float64)
+			label = tf.reshape(labels_raw, [batch_size, 13, 13, 125])
+			
+			
 
 		init_op = tf.group(tf.global_variables_initializer(), tf.global_variables_initializer())
 
@@ -82,7 +82,7 @@ def read_tf_records(batch_size=32):
 		coord = tf.train.Coordinator()
 		threads = tf.train.start_queue_runners(coord=coord)
 
-		print('----------------------------------------------\n                                            Running\n----------------------------------------------')
+		print('----------------------------------------------\n                Running\n----------------------------------------------')
 		for i in range(5):
 
 			img, lbl = sess.run([image, label])
