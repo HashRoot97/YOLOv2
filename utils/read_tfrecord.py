@@ -1,4 +1,3 @@
-
 import os
 import tensorflow as tf
 import numpy as np
@@ -80,7 +79,7 @@ def read_tf_records(batch_size=32):
 		sess.run(init_op)
 
 		coord = tf.train.Coordinator()
-		#threads = tf.train.start_queue_runners(coord=coord)
+		threads = tf.train.start_queue_runners(coord=coord)
 
 		print('----------------------------------------------\n                Running\n----------------------------------------------')
 		for i in range(20):
@@ -97,10 +96,10 @@ def read_tf_records(batch_size=32):
 						if lbl[0, x, y, 25*z] != 0:
 							r = []
 							for w in range(4):
-								r.append(lbl[0, x, y, 25*z+w])
+								r.append(lbl[0, x, y, 25*z+w+1])
 							roi.extend(r)
 							for t in range(20):
-								if lbl[0, x, y, 25*z+4+t] != 0:
+								if lbl[0, x, y, 25*z+5+t] != 0:
 									classes.append(t)
 			
 			print(roi, len(roi), classes)

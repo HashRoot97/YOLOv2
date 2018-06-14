@@ -292,8 +292,8 @@ def get_iou(bb1, bb2):
 
 def get_grid_cell(roi, grid_w, grid_h):
 
-	x_center = (roi[0]+roi[2])/2.0 
-	y_center = (roi[1]+roi[3])/2.0 
+	x_center = roi[0]+(roi[2]-roi[0])/2.0 
+	y_center = roi[1]+(roi[3]-roi[1])/2.0 
 
 	grid_x = int(x_center/(float(grid_w)))
 	grid_y = int(y_center/(float(grid_h)))
@@ -306,10 +306,10 @@ def anchor_to_label(roi, anchors, active_anchors, grid_x, grid_y, clas):
 
 	label = np.zeros([FLAGS.num_grids, FLAGS.num_grids, (5*(5 + FLAGS.num_classes))])
 
-	if active_anchors[0] != 0:
-		j = 25*active_anchors[0]-1
-	else:
-		j = 25*active_anchors[0]
+	# if active_anchors[0] != 0:
+	# 	j = 25*active_anchors[0]-1
+	# else:
+	j = 25*active_anchors[0]
 
 
 	if label[grid_x, grid_y, j] != 0:
@@ -317,7 +317,7 @@ def anchor_to_label(roi, anchors, active_anchors, grid_x, grid_y, clas):
 		return 0
 	else:
 
-		label[grid_x, grid_y, j] = active_anchors[1]
+		label[grid_x, grid_y, j] = 1.0
 
 		for i in range(4):
 			label[grid_x, grid_y, j+i+1] = roi[i]
