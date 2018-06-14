@@ -1,5 +1,6 @@
 Dataset
 ResizedJPEGImages
-JupyterNotebooks
+NumpyDataset
+TFRecords
 *.tar
 *.csv

@@ -80,10 +80,10 @@ def read_tf_records(batch_size=32):
 		sess.run(init_op)
 
 		coord = tf.train.Coordinator()
-		threads = tf.train.start_queue_runners(coord=coord)
+		#threads = tf.train.start_queue_runners(coord=coord)
 
 		print('----------------------------------------------\n                Running\n----------------------------------------------')
-		for i in range(5):
+		for i in range(20):
 
 			img, lbl = sess.run([image, label])
 			fix, ax = plt.subplots()
