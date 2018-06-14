@@ -33,6 +33,12 @@ classes_num = {'aeroplane': 0, 'bicycle': 1, 'bird': 2, 'boat': 3, 'bottle': 4, 
     'horse': 12, 'motorbike': 13, 'person': 14, 'pottedplant': 15, 'sheep': 16,
     'sofa': 17, 'train': 18, 'tvmonitor': 19}
 
+anchors_main = [[0.57273 ,0.677385],
+[1.87446 ,2.06253],
+[3.33843 ,5.47434],
+[7.88282 ,3.52778],
+[9.77052 ,9.16828]]
+
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -310,8 +316,12 @@ def anchor_to_label(roi, anchors, active_anchors, grid_x, grid_y, clas):
 	# 	j = 25*active_anchors[0]-1
 	# else:
 	j = 25*active_anchors[0]
-
-
+	r_ = np.zeros((4,))
+	x_center = roi[0]+(roi[2]-roi[0])/2.0 
+	y_center = roi[1]+(roi[3]-roi[1])/2.0 
+	# print(roi[0] / 416.0)
+	# print(roi[1] / 416.0)
+	# exit()
 	if label[grid_x, grid_y, j] != 0:
 		
 		return 0
@@ -319,11 +329,15 @@ def anchor_to_label(roi, anchors, active_anchors, grid_x, grid_y, clas):
 
 		label[grid_x, grid_y, j] = 1.0
 
-		for i in range(4):
-			label[grid_x, grid_y, j+i+1] = roi[i]
-		
+		r_[0] = roi[0] / 416.0
+		r_[1] = roi[1] / 416.0	
+		r_[2] = (roi[2] - roi[0]) / (anchors_main[active_anchors[0]][0] * 32)
+		r_[3] = (roi[3] - roi[1]) / (anchors_main[active_anchors[0]][1] * 32)
+		label[grid_x, grid_y, j+1] = r_[0]
+		label[grid_x, grid_y, j+2] = r_[1]
+		label[grid_x, grid_y, j+3] = r_[2]
+		label[grid_x, grid_y, j+4] = r_[3]
 		label[grid_x, grid_y, j+5+classes_num[clas]] = 1
-
 		return label
 	
 	#print("Label for anchor %d" %active_anchors[0], label[grid_x, grid_y, :])

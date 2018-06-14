@@ -6,11 +6,24 @@ import matplotlib.patches as patches
 
 
 
+
 classes_name = {0: 'aeroplane', 1: 'bicycle', 2: 'bird', 3: 'boat', 4: 'bottle', 5: 'bus',
      6: 'car', 7: 'cat', 8: 'chair', 9: 'cow', 10: 'diningtable', 11: 'dog',
     12: 'horse', 13: 'motorbike', 14: 'person', 15: 'pottedplant', 16: 'sheep',
     17: 'sofa', 18: 'train', 19: 'tvmonitor'}
 
+
+
+
+def read_anchors(file_path='./../anchors.txt'):
+	anchors = []
+	with open(file_path, 'r') as file:
+		for line in file.read().splitlines():
+			w, h = line.split()
+			anchor = [float(w), float(h)]
+			anchors.append(anchor)
+
+	return np.asarray(anchors)
 
 
 def list_tfrecord_file(folder, file_list):
@@ -82,6 +95,7 @@ def read_tf_records(batch_size=32):
 		threads = tf.train.start_queue_runners(coord=coord)
 
 		print('----------------------------------------------\n                Running\n----------------------------------------------')
+		anchors = read_anchors()
 		for i in range(20):
 
 			img, lbl = sess.run([image, label])
@@ -94,9 +108,13 @@ def read_tf_records(batch_size=32):
 				for y in range(13):
 					for z in range(5):
 						if lbl[0, x, y, 25*z] != 0:
-							r = []
-							for w in range(4):
-								r.append(lbl[0, x, y, 25*z+w+1])
+							r = np.zeros((4,))
+							r[0] = lbl[0, x, y, 25*z+1] * 416.0
+							r[1] = lbl[0, x, y, 25*z+2] * 416.0
+
+							r[2] = lbl[0, x, y, 25*z+3] * (anchors[z][0]*32)
+							r[3] = lbl[0, x, y, 25*z+4] * (anchors[z][1]*32)
+
 							roi.extend(r)
 							for t in range(20):
 								if lbl[0, x, y, 25*z+5+t] != 0:
@@ -111,7 +129,7 @@ def read_tf_records(batch_size=32):
 				x_max = roi[q+2]
 				y_max = roi[q+3]
 
-				rect = patches.Rectangle((x, y), (x_max - x), (y_max - y), linewidth=2, edgecolor='r', facecolor='none')
+				rect = patches.Rectangle((x, y), (x_max), (y_max), linewidth=2, edgecolor='r', facecolor='none')
 				ax.add_patch(rect)
 				ax.text(x, y, classes_name[classes[p]], horizontalalignment='left', verticalalignment='bottom', color='b')
 
